@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera with EMA</title>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0-dev.20241028-dd28f09ce2/dist/ort.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="/frontend/js/Predict_pushup.js"></script>
+  <style>
+    video, canvas {
+      width: 640px;
+      height: 480px;
+      border: 1px solid black;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <video id="camera" autoplay></video>
+  <canvas id="output"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+  <script>
+    // Khởi tạo MediaPipe Pose
+    const pose = new Pose({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
+    });
+    pose.setOptions({
+      modelComplexity: 2,
+      smoothLandmarks: false, // Không dùng smoothing tích hợp, tự làm mượt với EMA
+      enableSegmentation: false,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    const videoElement = document.getElementById('camera');
+    const canvasElement = document.getElementById('output');
+    const canvasCtx = canvasElement.getContext('2d', { willReadFrequently: true });
+
+    // Camera setup
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        await pose.send({ image: videoElement });
+      },
+      width: 640,
+      height: 480,
+    });
+    camera.start();
+
+    // Hệ số làm mượt EMA
+    const ALPHA = 0.5;
+    let emaLandmarks = null;
+    let lm_11, lm_12, lm_13, lm_14, lm_15, lm_16, lm_23, lm_24, lm_25, lm_26, lm_27, lm_28;
+    let shoulder, elbow, wrist, hip, knee, ankle;
+
+    // Hàm áp dụng EMA
+    function applyEma(currentLandmarks, emaLandmarks, alpha) {
+      if (!emaLandmarks) {
+        // Nếu chưa có dữ liệu trước, trả về landmark hiện tại
+        return currentLandmarks.map(({ x, y, z, visibility }) => ({ x, y, z, visibility }));
+      }
+      return currentLandmarks.map((current, i) => ({
+        x: alpha * current.x + (1 - alpha) * emaLandmarks[i].x,
+        y: alpha * current.y + (1 - alpha) * emaLandmarks[i].y,
+        z: alpha * current.z + (1 - alpha) * emaLandmarks[i].z,
+        visibility: alpha * current.visibility + (1 - alpha) * emaLandmarks[i].visibility,
+      }));
+    }
+
+    function calculate_angle(a, b, c) {
+      const x1 = a.x, y1 = a.y, z1 = a.z;
+      const x2 = b.x, y2 = b.y, z2 = b.z;
+      const x3 = c.x, y3 = c.y, z3 = c.z;
+
+      // Vectors BA and BC
+      const BA = [x1 - x2, y1 - y2, z1 - z2];
+      const BC = [x3 - x2, y3 - y2, z3 - z2];
+
+      // Dot product
+      const dotProduct = BA[0] * BC[0] + BA[1] * BC[1] + BA[2] * BC[2];
+
+      // Magnitudes
+      const magnitudeBA = Math.sqrt(BA[0] ** 2 + BA[1] ** 2 + BA[2] ** 2);
+      const magnitudeBC = Math.sqrt(BC[0] ** 2 + BC[1] ** 2 + BC[2] ** 2);
+
+      // Cosine of the angle
+      let cosTheta = dotProduct / (magnitudeBA * magnitudeBC);
+
+      // Clamp cosTheta to the valid range [-1, 1] to avoid math domain errors
+      cosTheta = Math.max(-1.0, Math.min(1.0, cosTheta));
+
+      // Angle in radians
+      const angleRad = Math.acos(cosTheta);
+
+      // Convert to degrees (optional)
+      const angleDeg = angleRad * (180 / Math.PI);
+
+      return Math.round(angleDeg);
+  }
+
+    // Lắng nghe sự kiện landmarks từ MediaPipe
+    pose.onResults((results) => {
+      if (results.poseLandmarks) {
+        // Áp dụng EMA
+        emaLandmarks = applyEma(results.poseLandmarks, emaLandmarks, ALPHA);
+
+        const specificLandmarks = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28].map(index => emaLandmarks[index]);
+
+        const dpr = window.devicePixelRatio || 1
+
+        canvasElement.width = 640 * dpr;
+        canvasElement.height = 480 * dpr;
+
+        // Vẽ video lên canvas
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+        const image = canvasCtx.getImageData(0, 0, canvasElement.width, canvasElement.height);
+
+        lm_11 = specificLandmarks[0];
+        lm_12 = specificLandmarks[1]; 
+        lm_13 = specificLandmarks[2];
+        lm_14 = specificLandmarks[3]; 
+        lm_15 = specificLandmarks[4];
+        lm_16 = specificLandmarks[5];  
+        lm_23 = specificLandmarks[6];
+        lm_24 = specificLandmarks[7]; 
+        lm_25 = specificLandmarks[8];
+        lm_26 = specificLandmarks[9]; 
+        lm_27 = specificLandmarks[10];
+        lm_28 = specificLandmarks[11]; 
+
+        if (lm_11.visibility> lm_12.visibility && lm_11.visibility> 0.8){
+            shoulder = lm_11;
+            elbow = lm_13;
+            wrist = lm_15;
+            hip = lm_23;
+            knee = lm_25;
+            ankle = lm_27;
+        }
+        else if (lm_12.visibility> lm_11.visibility && lm_12.visibility> 0.8){
+            shoulder = lm_12;
+            elbow = lm_14;
+            wrist = lm_16;
+            hip = lm_24;
+            knee = lm_26;
+            ankle = lm_28;
+        }
+
+        // console.log("Shouder: ", shoulder);
+        // console.log("Elbow: ", elbow);
+        // console.log("Wrist: ", wrist);
+        // console.log("Hip: ", hip);
+        // console.log("Knee: ", knee);
+        // console.log("Ankle: ", ankle);
+
+        if (shoulder && elbow && wrist && hip && knee && ankle){
+            elbow_angle = calculate_angle(shoulder, elbow, wrist)
+            hip_angle = calculate_angle(shoulder, hip, knee)
+            knee_angle = calculate_angle(hip, knee, ankle)
+
+            const angles =  [elbow_angle, hip_angle, knee_angle];
+
+            const tensorImage = tf.browser.fromPixels(image);
+
+            const landmarks = [shoulder.x, shoulder.y, shoulder.z,
+                               elbow.x, elbow.y, elbow.z,
+                               wrist.x, wrist.y, wrist.z,
+                               hip.x, hip.y, hip.z,
+                               knee.x, knee.y, knee.z,
+                               ankle.x, ankle.y, ankle.z];
+
+            const result = check_pushup(tensorImage, landmarks, angles);
+            
+            result.then(rs => {
+              console.log("Check: ", rs);
+            })
+            
+        }
+
+        // Vẽ landmarks đã làm mượt
+        specificLandmarks.forEach((landmark, index) => {
+
+          const x = landmark.x * canvasElement.width;
+          const y = landmark.y * canvasElement.height;
+          canvasCtx.beginPath();
+          canvasCtx.arc(x, y, 4, 0, 2 * Math.PI);
+          canvasCtx.fillStyle = 'lime';
+          canvasCtx.fill();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

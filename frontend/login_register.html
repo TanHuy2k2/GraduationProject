@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login|Register</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0-dev.20241028-dd28f09ce2/dist/ort.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+    <!-- Custom Scripts and Styles -->
+    <link rel="stylesheet" href="/frontend/css/style_login.css">
+    <script src="/frontend/js/Predict_AgeGender.js"></script>
+</head>
+<body>
+    <header class="header" id="header">
+        <div class="logo">H&P<span>AI</span></div>
+    </header>
+    <div id="notification-container"></div>
+
+    <div class="main-container">
+        <div class="form_container" style="display: block; margin-bottom: 0px;">
+            <form action="" id="form">
+                <label for="name">Name: </label>
+                <input type="text" id="name" placeholder="Your name">
+
+                <div style="width: 100%">
+                    <label for="age">Age: </label>
+                    <select name="ageSelect" id="ageSelect"></select>
+                </div>
+
+                <label for="gender">Gender:</label>
+                <input type="text" id="gender" placeholder="Predicted gender" disabled>
+
+                <label for="height">Height: (cm)</label>
+                <input type="text" id="height" placeholder="Your height (cm)">
+
+                <label for="weight">Weight: (kg)</label>
+                <input type="text" id="weight" placeholder="Your weight (kg)">
+
+                <label>Please select your level:</label>
+                <div class="radio">
+                    <label for="beginner">
+                        <input type="radio" id="beginner" name="level" value="Beginner">
+                        Beginner
+                    </label>
+                    <label for="normal">
+                        <input type="radio" id="normal" name="level" value="Normal">
+                        Normal
+                    </label>
+                    <label for="advanced">
+                        <input type="radio" id="advanced" name="level" value="Advanced">
+                        Advanced
+                    </label>
+                </div>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div id="container">
+            <video id="camera" autoplay playsinline></video>
+            <canvas class="output_canvas"></canvas>
+        </div>
+    </div>
+
+    <button id="toggleButton" class="off">Turn On Camera</button>
+
+    <!-- Additional JavaScript -->
+    <script src="/frontend/js/detect_face.js"></script>
+</body>
+</html>

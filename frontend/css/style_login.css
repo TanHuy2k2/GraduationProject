@@ -1,0 +1,361 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+html {
+    background: url('/frontend/images/hero-bg.jpg');
+    background-size: cover; /* Optional: to ensure the image covers the entire background */
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 15px 0;
+    background:none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s, padding 0.3s;
+    z-index: 1000;
+}
+  
+.logo {
+    display: flex;
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+}
+  
+.logo span {
+    color: #4A90E2; /* Accent color for 'AI' */
+}
+
+.main-container {
+    display: flex;
+    justify-content: flex-end; /* Aligns content to the right */
+    align-items: flex-start; /* Aligns content to the top */
+    gap: 10px; /* Space between the form and video/canvas */
+    margin-top: 20px;
+}
+
+
+/* Form styling */
+.form_container {
+    width: 100%;
+    max-width: 250px;
+    margin-bottom: 0;
+    margin-top: -35px;
+    margin-left: 0; /* Align the form on the far left */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    left: 0; /* Keep the form on the left edge of the page */
+    background-color: #e6e6fa; 
+}
+
+/* Input field styling */
+.form_container input[type="text"]{
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#ageSelect{
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#ageSelect option{
+    width: 200px;
+    text-align: left; 
+    border: none;
+}
+
+/* Button styling */
+.form_container button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: none;
+    background-color: rgba(152, 251, 152, 0.85);
+    color: #004d00;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form_container button:hover {
+    background-color: #45a049;
+}
+
+#container {
+    display: flex;
+}
+#camera {
+    width: 100px; /* Adjust the width as needed */
+    height: 100px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background-color: #ffffff;
+}
+.output_canvas{
+    width: 640px;
+    height: 480px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background-color: white;
+}
+
+/* Style the radio inputs and labels */
+.radio input[type="radio"] {
+    margin-right: 10px;
+    accent-color: #4CAF50; /* Change the radio button color */
+    cursor: pointer;
+}
+
+.radio label {
+    margin-right: 15px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.radio {
+    display: flex;
+    flex-direction: column; /* Stack radio buttons vertically */
+    gap: 7px; /* Adds space between radio buttons */
+}
+
+/* Add a hover effect */
+.radio input[type="radio"]:hover {
+    outline: 2px solid #4CAF50;
+}
+
+/* Change appearance when radio button is checked */
+.radio input[type="radio"]:checked {
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.6); /* Adds glow effect */
+}
+
+/* Custom focus state for accessibility */
+.radio input[type="radio"]:focus {
+    outline: 3px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+#notification-container {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 280px;
+    z-index: 1000;
+    background-color: #4caf50;
+    color: #fff;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateX(100%);
+    animation: slideIn 0.5s forwards, fadeOut 0.5s ease-out 4.5s forwards;
+}
+
+#toggleButton {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ff0000;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#toggleButton.off {
+    background: rgba(152, 251, 152, 0.85); /* Mint Green */
+    color: #004d00; /* Dark Green for text */
+    font-weight: bold;
+}
+
+.disabled {
+    opacity: 0.5; /* Visually indicates disabled state */
+    pointer-events: none; /* Prevents interaction */
+  }
+
+@media (max-width: 1200px) {
+    .title-card{
+        width: 748px;
+    }
+
+    .title-card h1{
+        max-width: 100%;
+        font-size: 1.6em;
+    }
+
+    #toggleButton{
+        margin-left: 50px;
+    }
+
+    .form_container{
+        margin-top: -13px;
+        margin-bottom: 50px !important; 
+    }
+}
+
+@media (max-width: 1000px) {
+    .output_canvas {
+        width: 640px; /* Smaller output canvas */
+        height: 480px; /* Maintain aspect ratio */
+    }
+
+    .form_container {
+        width: 40%; /* Allow more space on medium screens */
+    }
+    .form_container input[type="text"] {
+        width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column; /* Stack elements vertically */
+        align-items: center; /* Center elements */
+    }
+    
+    #container {
+        flex-direction: column; /* Stack camera and canvas vertically */
+        align-items: center; /* Center camera and canvas */
+    }
+
+    .output_canvas {
+        max-width: 540px; /* Full width for smaller screens */
+        max-height: 440px; /* Maintain aspect ratio */
+    }
+    .title-card{
+        width: 100%;
+    }
+    .title-card h1{
+        font-size: 1.4em;
+    }
+    #toggleButton{
+        margin-top: 10px;
+        margin-left: 10px;
+    }
+    .form_container{
+        margin-bottom: -100px !important;
+    }
+
+    .form_container input[type="text"] {
+        width: 90%;
+    }
+}
+
+@media (max-width: 576px) {
+    .form_container {
+        width: 100%; /* Full width for mobile */
+    }
+
+    .form_container input[type="text"],
+    .form_container button {
+        font-size: 14px; /* Smaller font size for mobile */
+    }
+    .title-card {
+        width: 98%;
+    }
+    .title-card h1 { 
+        font-size: 1.2em; /* Smaller heading size */
+    }
+
+    .output_canvas {
+        max-width: 480px; /* Full width for smaller screens */
+        max-height: 400px; /* Maintain aspect ratio */
+    }
+}
+@media (max-width: 480px) {
+    .form_container {
+        width: 100%; /* Full width for mobile */
+    }
+
+    .form_container input[type="text"],
+    .form_container button {
+        font-size: 14px; /* Smaller font size for mobile */
+    }
+
+    .title-card h1 {
+        font-size: 1em; /* Smaller heading size */
+    }
+    .output_canvas {
+        max-width: 98%; /* Full width for smaller screens */
+        max-height: 400px; /* Maintain aspect ratio */
+    }
+}
+
+@media (max-width: 350px) {
+    .form_container {
+        width: 100%; /* Full width for mobile */
+    }
+
+    .form_container input[type="text"],
+
+    .form_container button {
+        font-size: 14px; /* Smaller font size for mobile */
+    }
+    .title-card {
+        width: 95%;
+    }
+
+    .title-card h1 {
+        font-size: 1em; /* Smaller heading size */
+    }
+    .output_canvas {
+        max-width: 95%; /* Full width for smaller screens */
+        max-height: 350px; /* Maintain aspect ratio */
+    }
+}
+@media (max-width: 285px) {
+    .form_container {
+        width: 95%; /* Full width for mobile */
+    }
+
+    .form_container input[type="text"],
+
+    .form_container button {
+        font-size: 13px; /* Smaller font size for mobile */
+    }
+    .title-card {
+        width: 85%;
+    }
+
+    .title-card h1 {
+        font-size: 1em; /* Smaller heading size */
+    }
+    .output_canvas {
+        max-width: 95%; /* Full width for smaller screens */
+        max-height: 350px; /* Maintain aspect ratio */
+    }
+}
+@media (max-height: 650px){
+    .output_canvas {
+        max-width: 95%; /* Full width for smaller screens */
+        max-height: 450px; /* Maintain aspect ratio */
+    }
+    #toggleButton{
+        margin-top: 5px;
+    }
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose" crossorigin="anonymous"></script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>Exercises</title>
+  <link rel="stylesheet" href="/frontend/css/style_exercise.css">
+  <script src="/frontend/js/Predict_pushup.js"></script>
+</head>
+
+<body>
+
+  <div class="exercise-box" id="exercise-box">
+    <h3 id="exercise-name"></h3>
+    <div class="details">
+      <span id="dumbbell">Dumbbell weight: <span id="db_weights"></span>(kg),</span>
+      <span>Sets: <span id="sets"></span>,</span>
+      <span>Reps: <span id="reps"></span>,</span>
+      <span>Rest Time: <span id="rest"></span>s</span>
+    </div>
+  </div> 
+   
+  <div id="notification-container"></div>
+
+  <div class="main-container">
+    
+    <div class="form-container" id="formContainer">
+      <div class="topnav">
+        <a href="javascript:void(0);" class="icon" onclick="click_form()">
+          <i class="fa fa-remove" id="toggleIcon"></i>
+        </a>
+      </div>
+      <form action="" id="form-form">
+        <div class="row-name">
+          <input type="text" id="name" disabled>
+        </div>
+        <div class="form-row">
+          <label>Age: </label>
+          <input type="text" id="age" disabled>
+        </div>
+        <div class="form-row">
+          <label>Gender:</label>
+          <input type="text" id="gender" disabled>
+        </div>
+        <div class="form-row">
+          <label>BMI: </label>
+          <input type="text" id="bmi" disabled>
+        </div>
+        <div class="form-row">
+          <label>Level: </label>
+          <input type="text" id="level" disabled>
+        </div>
+      </form>
+    </div>
+
+    <div id="container">
+      <video id="camera" class="input_video" playsinline></video>
+      <div id="mini-container">
+        <canvas class="output_canvas"></canvas>
+        
+        <form id="check-form" class="check-form">
+          <div class="form-row">
+            <label for="option1">Fatigue level</label>
+            <input type="range" id="slider1" min="1" max="10" value="5">
+            <span id="sliderValue">5</span>
+          </div>
+          <div class="form-row">
+            <label for="option2">Difficulty level</label>
+            <select id="option2">
+              <option value="Easy">Easy</option>
+              <option value="Normal">Normal</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+
+        <video id="video_check" autoplay loop muted>
+          <source src = "" type="video/mp4" id="source">
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/pose_estimation.js"></script>
+
+</body>
+</html>
